@@ -20,8 +20,6 @@ BEFORE INSERT ON SalesDetails
 FOR EACH ROW
 EXECUTE FUNCTION update_stock_on_sale();
 
-
-
 --Adds stock_quantity in Products table for every purchase
 CREATE OR REPLACE FUNCTION update_stock_on_purchase()
 RETURNS TRIGGER AS $$
@@ -47,10 +45,10 @@ RETURNS TRIGGER AS $$
 DECLARE
     v_quantity_change INT;
 BEGIN
-    -- Calculate the quantity change
+    --Calculate the quantity change
     v_quantity_change := NEW.stock_quantity - OLD.stock_quantity;
 
-    -- Insert a record into the InventoryAudit table
+    --Insert record into the InventoryAudit table
     INSERT INTO InventoryAudit (
         product_id,
         change_type,
@@ -59,18 +57,17 @@ BEGIN
         date
     )
     VALUES (
-        NEW.id,  -- The product ID
+        NEW.id,
         CASE
             WHEN v_quantity_change > 0 THEN 'PURCHASE'
             WHEN v_quantity_change < 0 THEN 'SALE'
             ELSE 'MANUAL ADJUSTMENT'
         END,  -- The change type
-        v_quantity_change,  -- The quantity change (positive for addition, negative for reduction)
-        NEW.stock_quantity,  -- The updated stock level
-        CURRENT_TIMESTAMP  -- The date and time of the change
+        v_quantity_change,  --Quantity change (positive for addition, negative for reduction)
+        NEW.stock_quantity,  --Updated stock level
+        CURRENT_TIMESTAMP
     );
 
-    -- Return the new row to allow the update to proceed
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;

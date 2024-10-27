@@ -73,5 +73,5 @@ season_5y as (
 select season_id, team_name, wins, losses, win_rate, wins_5y, loss_5y, ROUND(wins_5y/(wins_5y+loss_5y), 3) as win_rate_5y
 from season_5y
 where seasons_included = 5
-order by win_rate_5y DESC
+order by win_rate_5y DESC;
 
